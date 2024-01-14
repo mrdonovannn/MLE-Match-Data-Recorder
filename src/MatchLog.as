@@ -1,3 +1,5 @@
+
+
 void UpdateMatchLog() {
     auto logName = GenerateMatchName();
     auto @matchLog = DB::GetMatchLog(logName);
@@ -8,6 +10,7 @@ void UpdateMatchLog() {
 
 void AddMapRound(Json::Value@ j) {
     j['rounds'].Add(GenerateMapRoundSummary(IsPodium(GetApp().Network.ClientManiaAppPlayground)));
+
 }
 
 Json::Value@ GenerateMapRoundSummary(bool isPodiumSummary = false) {

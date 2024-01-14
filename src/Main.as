@@ -1,6 +1,7 @@
 void Main(){
     InitializeDb();
-    MonitoringLoop();
+    startnew(MonitoringLoop);
+    startnew(MonitorLastInServerTime);
 }
 
 string currServerName;
@@ -15,15 +16,22 @@ bool isKO;
 bool isCup;
 bool isRounds;
 
+// reset to true on server change
+bool shouldKeepRecordingThisRound = true;
+
 void MonitoringLoop() {
     auto app = GetApp();
     auto net = app.Network;
     auto si = cast<CTrackManiaNetworkServerInfo>(net.ServerInfo);
     while (true) {
         yield();
+        if (!S_Enabled) continue;
         currServerLogin = si.ServerLogin;
         currServerName = si.ServerName;
-        trace("Starting server login watch loop");
+        if (si.ServerLogin.Length == 0) continue;
+        trace("Starting server login watch loop, login: " + currServerLogin + currServerLogin.Length);
+        shouldKeepRecordingThisRound = currServerLogin.Length > 0;
+        if (shouldKeepRecordingThisRound) startnew(OnJoinServer);
         while (si.ServerLogin == currServerLogin) {
             currGameMode = si.ModeName;
             isTeams = currGameMode.StartsWith("TM_Teams");
@@ -34,12 +42,78 @@ void MonitoringLoop() {
             trace("Starting game mode watch loop");
             serverConnectStart = Time::Stamp;
             serverConnectStartStr = app.OSLocalDate.Replace("/", "-").Replace(":", "_");
-            while (si.ServerLogin == currServerLogin && currGameMode == si.ModeName) {
+            while (si.ServerLogin == currServerLogin && currGameMode == si.ModeName && shouldKeepRecordingThisRound) {
                 if (isGoodMode) UpdateLoopInServer();
                 yield();
             }
+
+            while (!shouldKeepRecordingThisRound && si.ServerLogin == currServerLogin) yield();
+
             yield();
         }
+    }
+}
+
+uint lastInServerTime;
+void MonitorLastInServerTime() {
+    auto app = GetApp();
+    if (app.Network.ServerInfo is null) NotifyWarning("Network SI null!");
+    while (app.Network.ServerInfo is null) yield();
+    auto si = cast<CTrackManiaNetworkServerInfo>(app.Network.ServerInfo);
+    while (true) {
+        if (si.ServerLogin.Length > 0) lastInServerTime = Time::Now;
+        yield();
+    }
+}
+
+void StartRecordingIfDisabled() {
+    shouldKeepRecordingThisRound = true;
+    UpdateMatchLog();
+}
+
+void PauseRecording() {
+    shouldKeepRecordingThisRound = false;
+}
+
+uint joinServerNonce;
+void OnJoinServer() {
+    if (!shouldKeepRecordingThisRound) return;
+    uint myNonce = Math::Rand(0, 1000000000);
+    joinServerNonce = myNonce;
+    while (!StillInServer(GetApp())) yield();
+    if (joinServerNonce != myNonce) return;
+    isTeams = currGameMode.StartsWith("TM_Teams");
+    isKO = currGameMode.StartsWith("TM_Knockout");
+    isCup = currGameMode.StartsWith("TM_Cup");
+    isRounds = currGameMode.StartsWith("TM_Rounds");
+
+    if (ShouldPromptWhenJoining(currGameMode)) {
+        trace('on join server should prompt');
+        UpdateMatchLog();
+        ShowMatchRecorderPrompt();
+    }
+}
+
+void RenderInterface() {
+    if (!S_Enabled) return;
+    RenderMatchLogUI();
+    if (S_ShowRecordingUI) RenderRecordingUI();
+}
+
+const string PluginName = Meta::ExecutingPlugin().Name;
+const string MenuLabel = "\\$f28" + Icons::ListAlt + Icons::Circle + "\\$z " + Meta::ExecutingPlugin().Name;
+
+/** Render function called every frame intended only for menu items in `UI`.
+*/
+void RenderMenu() {
+    if (UI::BeginMenu(MenuLabel)) {
+        if (UI::MenuItem("Enabled", "", S_Enabled)) {
+            S_Enabled = !S_Enabled;
+        }
+        if (UI::MenuItem("Show Recording UI", "", S_ShowRecordingUI)) {
+            S_ShowRecordingUI = !S_ShowRecordingUI;
+        }
+        UI::EndMenu();
     }
 }
 
@@ -84,11 +158,13 @@ void UpdateLoopInServer() {
     // update map details;
     currMapName = StripFormatCodes(app.RootMap.MapInfo.Name);
     currMapUid = app.RootMap.EdChallengeId;
+    // don't save stuff if the warmup is active
+    if (MLFeed::GetTeamsMMData_V1().WarmUpIsActive) return;
     // if we hit a reason to save stats, do that
     if (IsEndRoundOrUiInteraction(cmap)) UpdateMatchLog();
     // wait for the map to change, or a loading screen to be present, etc.
     while (StillInServer(app) && IsEndRoundOrUiInteraction(cmap)) yield();
-    // if the next UI sequence is Podium, update and save results
+    // if the next UI sequence is Podium, update and save podium results
     if (StillInServer(app) && IsPodium(cmap)) UpdateMatchLog();
     while (StillInServer(app) && IsPodium(cmap)) yield();
 }

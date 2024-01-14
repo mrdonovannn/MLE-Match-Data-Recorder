@@ -4,23 +4,30 @@ void InitializeDb() {
     // scan files mb
 }
 
+// the most recently requested match log
+Json::Value@ currMatchLog;
+
 namespace DB {
     dictionary loadedMatches;
+
 
     Json::Value@ GetMatchLog(const string &in logName) {
         if (!loadedMatches.Exists(logName)) {
             @loadedMatches[logName] = NewMatchLog(logName);
         }
-        return cast<Json::Value>(loadedMatches[logName]);
+        @currMatchLog = cast<Json::Value>(loadedMatches[logName]);
+        return currMatchLog;
     }
 
     Json::Value@ NewMatchLog(const string &in logName) {
         auto j = Json::Object();
+        j['name'] = logName;
         j['logName'] = logName + ".json";
         j['serverLogin'] = currServerLogin;
         j['gameMode'] = currGameMode;
         j['serverName'] = currServerName;
         j['maps'] = Json::Array();
+        j['createdTs'] = Time::Stamp;
         return j;
     }
 
@@ -29,6 +36,16 @@ namespace DB {
         auto path = IO::FromStorageFolder(fileName);
         print("Writing file: " + path);
         Json::ToFile(path, j);
+    }
+
+    bool RemoveAndDeleteMatchLogIfEmpty(const string &in logName) {
+        auto ln = logName.EndsWith(".json") ? logName.SubStr(0, logName.Length - 5) : logName;
+        auto path = IO::FromStorageFolder(ln + ".json");
+        bool remLoadedMatch = loadedMatches.Exists(ln);
+        bool delFile = IO::FileExists(path);
+        if (remLoadedMatch) loadedMatches.Delete(ln);
+        if (delFile) IO::Delete(path);
+        return delFile || remLoadedMatch;
     }
 }
 
