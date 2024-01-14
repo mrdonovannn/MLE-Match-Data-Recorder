@@ -113,6 +113,9 @@ void RenderMenu() {
         if (UI::MenuItem("Show Recording UI", "", S_ShowRecordingUI)) {
             S_ShowRecordingUI = !S_ShowRecordingUI;
         }
+        if (UI::MenuItem("Open Log Folder", "", false)) {
+            OpenExplorerPath(IO::FromStorageFolder(""));
+        }
         UI::EndMenu();
     }
 }
