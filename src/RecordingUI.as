@@ -1,4 +1,14 @@
+[Setting hidden]
+uint S_AutoHideRecordingUIOutsideServerDelay = 10000;
+
 void RenderRecordingUI() {
+    bool inServer = StillInServer(GetApp());
+    // if this isn't a mode we record and we're in a server, don't show the UI
+    if (!isGoodMode && inServer) return;
+    bool showForAutohide = !inServer && currMatchLog !is null && lastInServerTime > 0 && lastInServerTime + S_AutoHideRecordingUIOutsideServerDelay > Time::Now;
+
+    if (!showForAutohide && !inServer) return;
+
     UI::SetNextWindowPos(Draw::GetWidth() * 8 / 10, Draw::GetHeight() * 1 / 10, UI::Cond::FirstUseEver);
     // int flags = UI::WindowFlags::NoTitleBar | UI::WindowFlags::AlwaysAutoResize;
     int flags = UI::WindowFlags::AlwaysAutoResize | UI::WindowFlags::NoCollapse;
@@ -11,16 +21,14 @@ void RenderRecordingUI() {
 void RenderRecordingUI_Inner() {
     if (!StillInServer(GetApp())) {
         UI::Text("Not in a server");
-        if (currMatchLog !is null && lastInServerTime > 0) {
-            if (lastInServerTime + 10000 > Time::Now) {
-                UI::Text("Last log file name: " + string(currMatchLog['logName']));
-                if (UI::Button("Open Log Folder")) {
-                    OpenExplorerPath(IO::FromStorageFolder(""));
-                }
-            }
-        } else {
-            lastInServerTime = 0;
+        UI::AlignTextToFramePadding();
+        UI::Text("Last log file name: " + string(currMatchLog['logName']));
+        if (UI::Button("Open Log Folder")) {
+            OpenExplorerPath(IO::FromStorageFolder(""));
         }
+        UI::AlignTextToFramePadding();
+        auto deltaMs = int(lastInServerTime + S_AutoHideRecordingUIOutsideServerDelay) - Time::Now;
+        UI::Text("Autohiding in: " + Time::Format(deltaMs, false));
         // if (UI::Button(""))
         return;
     }

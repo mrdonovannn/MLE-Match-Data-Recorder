@@ -15,9 +15,12 @@ bool isTeams;
 bool isKO;
 bool isCup;
 bool isRounds;
+bool isGoodMode;
 
 // reset to true on server change
 bool shouldKeepRecordingThisRound = true;
+
+
 
 void MonitoringLoop() {
     auto app = GetApp();
@@ -32,13 +35,14 @@ void MonitoringLoop() {
         trace("Starting server login watch loop, login: " + currServerLogin + currServerLogin.Length);
         shouldKeepRecordingThisRound = currServerLogin.Length > 0;
         if (shouldKeepRecordingThisRound) startnew(OnJoinServer);
+        isGoodMode = false;
         while (si.ServerLogin == currServerLogin) {
             currGameMode = si.ModeName;
-            isTeams = currGameMode.StartsWith("TM_Teams");
-            isKO = currGameMode.StartsWith("TM_Knockout");
-            isCup = currGameMode.StartsWith("TM_Cup");
-            isRounds = currGameMode.StartsWith("TM_Rounds");
-            bool isGoodMode = isTeams || isKO || isCup || isRounds;
+            isTeams = S_RecordTeams && currGameMode.StartsWith("TM_Teams");
+            isKO = S_RecordKO && currGameMode.StartsWith("TM_Knockout");
+            isCup = S_RecordCup && currGameMode.StartsWith("TM_Cup");
+            isRounds = S_RecordRounds && currGameMode.StartsWith("TM_Rounds");
+            isGoodMode = isTeams || isKO || isCup || isRounds;
             trace("Starting game mode watch loop");
             serverConnectStart = Time::Stamp;
             serverConnectStartStr = app.OSLocalDate.Replace("/", "-").Replace(":", "_");
