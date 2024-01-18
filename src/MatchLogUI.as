@@ -43,8 +43,17 @@ void RenderMatchPromptUI_Inner() {
     }
 }
 
+void StopRecordingAndStartNew() {
+    shouldKeepRecordingThisRound = true;
+    // reset the saved server login to trigger new recording
+    currServerLogin = "";
+    // yield();
+    // yield();
+    // startnew(OnJoinServer);
+
+}
+
 void DisableRecordingForThisSession() {
-    // todo
     shouldKeepRecordingThisRound = false;
     if (currMatchLog !is null) {
         bool deleted = DB::RemoveAndDeleteMatchLogIfEmpty(currMatchLog['logName']);

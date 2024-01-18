@@ -21,7 +21,15 @@ bool isGoodMode;
 bool shouldKeepRecordingThisRound = true;
 
 
-
+/**
+ * Main monitoring loop.
+ * Detect a server connection when the server login string is populated.
+ * While we are connected to the same server, the server loop runs.
+ * In the server loop, we check for the game mode (which can be updated between maps).
+ * Inside that, we have the recording loop. This is active for the same server with the same mode.
+ * This calls the UpdateLoopInServer function (which sometimes takes 1 frame, and sometimes yields to wait for certain conditions).
+ * We also have a not-recording loop, to pause recording while we're connected to a server but shouldKeepRecordingThisRound is false.
+ */
 void MonitoringLoop() {
     auto app = GetApp();
     auto net = app.Network;
@@ -36,7 +44,10 @@ void MonitoringLoop() {
         shouldKeepRecordingThisRound = currServerLogin.Length > 0;
         if (shouldKeepRecordingThisRound) startnew(OnJoinServer);
         isGoodMode = false;
-        while (si.ServerLogin == currServerLogin) {
+        serverConnectStart = Time::Stamp;
+        serverConnectStartStr = app.OSLocalDate.Replace("/", "-").Replace(":", "_");
+        // the server loop
+        while (si.ServerLogin == currServerLogin && S_Enabled) {
             currGameMode = si.ModeName;
             isTeams = S_RecordTeams && currGameMode.StartsWith("TM_Teams");
             isKO = S_RecordKO && currGameMode.StartsWith("TM_Knockout");
@@ -44,8 +55,7 @@ void MonitoringLoop() {
             isRounds = S_RecordRounds && currGameMode.StartsWith("TM_Rounds");
             isGoodMode = isTeams || isKO || isCup || isRounds;
             trace("Starting game mode watch loop");
-            serverConnectStart = Time::Stamp;
-            serverConnectStartStr = app.OSLocalDate.Replace("/", "-").Replace(":", "_");
+            // the recording loop
             while (si.ServerLogin == currServerLogin && currGameMode == si.ModeName && shouldKeepRecordingThisRound) {
                 if (isGoodMode) UpdateLoopInServer();
                 yield();
@@ -59,6 +69,7 @@ void MonitoringLoop() {
 }
 
 uint lastInServerTime;
+// Keeps track of whether we're in a server so we can autohide the post-game helper window.
 void MonitorLastInServerTime() {
     auto app = GetApp();
     if (app.Network.ServerInfo is null) NotifyWarning("Network SI null!");
@@ -184,7 +195,8 @@ bool IsStartTimeLTEndTime(CGameCtnApp@ app) {
 }
 
 bool StillInServer(CGameCtnApp@ app) {
-    return app.RootMap !is null && app.Network.ClientManiaAppPlayground !is null && !IsLoadingScreenShowing(app);
+    return app.RootMap !is null && app.Network.ClientManiaAppPlayground !is null && !IsLoadingScreenShowing(app)
+        && cast<CTrackManiaNetworkServerInfo>(app.Network.ServerInfo).ServerLogin.Length > 0;
 }
 
 

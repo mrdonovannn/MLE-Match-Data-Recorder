@@ -58,6 +58,17 @@ void RenderRecordingUI_Inner() {
 
     UI::SameLine();
     UI::BeginDisabled(!canStop);
+    if (UI::Button(Icons::Stop + Icons::FileO)) {
+        startnew(StopRecordingAndStartNew);
+    }
+    UI::EndDisabled();
+    AddSimpleTooltip("Stop recording and start a new one if appropriate.");
+
+    UI::SameLine();
+    UI::Dummy(vec2(20, 0));
+
+    UI::SameLine();
+    UI::BeginDisabled(!canStop);
     if (UI::Button(Icons::Stop + Icons::Trash)) {
         DisableRecordingForThisSession();
     }
