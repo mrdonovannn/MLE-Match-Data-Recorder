@@ -48,14 +48,18 @@ Json::Value@ GenerateMapRoundSummary(bool isPodiumSummary = false) {
     j['pointsLimit'] = teams.PointsLimit;
     for (uint i = 0; i < rd.SortedPlayers_Race.Length; i++) {
         auto p = cast<MLFeed::PlayerCpInfo_V4>(rd.SortedPlayers_Race[i]);
+        auto playerData = GenPlayerTimes(p);
         if (isPodiumSummary) {
             j['playerPoints'][p.Name] = p.Points;
             j['roundPoints'][p.Name] = p.RoundPoints;
             auto tn = tostring(p.TeamNum);
             if (!j['teams'].HasKey(tn)) j['teams'][tn] = Json::Array();
             j['teams'][tn].Add(p.Name);
+            // only add login and wsid on podium summary to avoid bloat
+            playerData['login'] = p.Login;
+            playerData['wsid'] = p.WebServicesUserId;
         }
-        j['players'].Add(GenPlayerTimes(p));
+        j['players'].Add(playerData);
     }
     print("Generated summary: " + Json::Write(j));
     return j;
@@ -65,6 +69,8 @@ Json::Value@ GenPlayerTimes(const MLFeed::PlayerCpInfo_V4@ p) {
     Json::Value@ j = Json::Object();
     j['cpTimes'] = p.CpTimes.ToJson();
     j['respawnTimeLoss'] = p.TimeLostToRespawnByCp.ToJson();
+    j['nbRespawnsByCp'] = p.NbRespawnsByCp.ToJson();
+    j['respawnTimes'] = p.RespawnTimes.ToJson();
     j['finished'] = p.IsFinished;
     j['name'] = p.Name;
     j['bestTime'] = p.BestTime;
@@ -72,6 +78,7 @@ Json::Value@ GenPlayerTimes(const MLFeed::PlayerCpInfo_V4@ p) {
     j['points'] = p.Points;
     j['nbRespawns'] = p.NbRespawnsRequested;
     j['team'] = p.TeamNum;
+    j['dnf'] = p.Eliminated;
     if (isKO && p.KoState !is null) {
         j['ko_alive'] = p.KoState.isAlive;
         j['ko_dnf'] = p.KoState.isDNF;
