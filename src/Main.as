@@ -76,6 +76,10 @@ void MonitorLastInServerTime() {
     while (app.Network.ServerInfo is null) yield();
     auto si = cast<CTrackManiaNetworkServerInfo>(app.Network.ServerInfo);
     while (true) {
+        if (!isGoodMode) {
+            sleep(200);
+            continue;
+        }
         if (si.ServerLogin.Length > 0) lastInServerTime = Time::Now;
         yield();
     }

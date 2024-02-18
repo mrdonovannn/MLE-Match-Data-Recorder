@@ -7,11 +7,11 @@ bool S_ShowRecordingUI = true;
 [Setting category="Game Modes" name="Record Teams mode?"]
 bool S_RecordTeams = true;
 [Setting category="Game Modes" name="Record KO mode?"]
-bool S_RecordKO = true;
+bool S_RecordKO = false;
 [Setting category="Game Modes" name="Record Cup mode?"]
-bool S_RecordCup = true;
+bool S_RecordCup = false;
 [Setting category="Game Modes" name="Record Rounds mode?"]
-bool S_RecordRounds = true;
+bool S_RecordRounds = false;
 
 [Setting category="Autoprompt" name="Prompt for Teams mode?"]
 bool S_AutoPromptForTeams = true;
