@@ -1,5 +1,4 @@
-
-
+// Calling this adds a new entry to the match log. It's called from Main.as
 void UpdateMatchLog() {
     auto logName = GenerateMatchName();
     auto @matchLog = DB::GetMatchLog(logName);
@@ -10,7 +9,6 @@ void UpdateMatchLog() {
 
 void AddMapRound(Json::Value@ j) {
     j['rounds'].Add(GenerateMapRoundSummary(IsPodium(GetApp().Network.ClientManiaAppPlayground)));
-
 }
 
 Json::Value@ GenerateMapRoundSummary(bool isPodiumSummary = false) {
@@ -61,7 +59,7 @@ Json::Value@ GenerateMapRoundSummary(bool isPodiumSummary = false) {
         }
         j['players'].Add(playerData);
     }
-    print("Generated summary: " + Json::Write(j));
+    // print("Generated summary: " + Json::Write(j));
     return j;
 }
 
@@ -83,7 +81,6 @@ Json::Value@ GenPlayerTimes(const MLFeed::PlayerCpInfo_V4@ p) {
         j['ko_alive'] = p.KoState.isAlive;
         j['ko_dnf'] = p.KoState.isDNF;
     }
-    // j['wsid'] = p.WebServicesUserId;
     return j;
 }
 

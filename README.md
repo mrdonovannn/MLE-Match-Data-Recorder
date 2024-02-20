@@ -1,11 +1,5 @@
-# 
+# MLE Match Data Recorder
 
-License: Public Domain
+Records match data (teams, KO, etc) during play and saves a .json file with all rounds for that
 
-Authors: XertroV
-
-Suggestions/feedback: @XertroV on Openplanet discord
-
-Code/issues: [https://github.com/XertroV/tm-play-map](https://github.com/XertroV/tm-play-map)
-
-GL HF
+Code/issues: [https://github.com/mrdonovannn/MLE-Match-Data-Recorder/](https://github.com/mrdonovannn/MLE-Match-Data-Recorder/)
