@@ -12,8 +12,9 @@ void RenderRecordingUI() {
     UI::SetNextWindowPos(Draw::GetWidth() * 8 / 10, Draw::GetHeight() * 1 / 10, UI::Cond::FirstUseEver);
     // int flags = UI::WindowFlags::NoTitleBar | UI::WindowFlags::AlwaysAutoResize;
     int flags = UI::WindowFlags::AlwaysAutoResize | UI::WindowFlags::NoCollapse;
-    if (UI::Begin("Match Recorder##recordingui", flags)) {
+    if (UI::Begin(PluginName + "##recordingui", flags)) {
         RenderRecordingUI_Inner();
+        RenderUIFooter(false);
     }
     UI::End();
 }
@@ -32,7 +33,7 @@ void RenderRecordingUI_Inner() {
         // if (UI::Button(""))
         return;
     }
-    UI::Text("Server: " + currServerName);
+    UI::Text("Server: " + ColoredString(currServerName));
     bool inAServer = currServerLogin.Length > 0;
     bool isRecording = inAServer && shouldKeepRecordingThisRound;
     bool canPause = isRecording && inAServer;

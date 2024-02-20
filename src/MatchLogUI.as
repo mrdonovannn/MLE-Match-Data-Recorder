@@ -19,8 +19,18 @@ void RenderMatchLogUI() {
     UI::SetNextWindowSize(wwidth, -1, UI::Cond::Always);
     if (UI::Begin(PluginName + ": Current Match", showMatchLogUI)) {
         RenderMatchPromptUI_Inner();
+        RenderUIFooter();
     }
     UI::End();
+}
+
+void RenderUIFooter(bool addLink = true) {
+    UI::Separator();
+    UI::Text("\\$aaa" + PluginName);
+    if (addLink) {
+        UI::SameLine();
+        UI::Markdown("[mlesports.gg/apply](https://mlesports.gg/apply)");
+    }
 }
 
 void RenderMatchPromptUI_Inner() {
