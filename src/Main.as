@@ -1,5 +1,6 @@
 void Main(){
     InitializeDb();
+    startnew(LoadTextures);
     startnew(MonitoringLoop);
     startnew(MonitorLastInServerTime);
 }

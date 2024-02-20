@@ -26,10 +26,21 @@ void RenderMatchLogUI() {
 
 void RenderUIFooter(bool addLink = true) {
     UI::Separator();
+
+    auto lineHeight = UI::GetTextLineHeightWithSpacing();
+    auto imgSize = vec2(lineHeight * 2.0);
+    auto cursorStart = UI::GetCursorPos();
+    auto spacing = UI::GetStyleVarVec2(UI::StyleVar::ItemSpacing);
+    UI::Dummy(vec2(imgSize.x, 0));
+    UI::SameLine();
     UI::Text("\\$aaa" + PluginName);
-    if (addLink) {
-        UI::SameLine();
-        UI::Markdown("[mlesports.gg/apply](https://mlesports.gg/apply)");
+    UI::Dummy(vec2(imgSize.x, 0));
+    UI::SameLine();
+    UI::Markdown("[mlesports.gg/apply](https://mlesports.gg/apply)");
+
+    if (logoTexture !is null) {
+        UI::SetCursorPos(cursorStart);
+        UI::Image(logoTexture, imgSize);
     }
 }
 

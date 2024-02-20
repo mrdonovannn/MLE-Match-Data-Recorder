@@ -1,3 +1,10 @@
+UI::Texture@ logoTexture;
+
+void LoadTextures() {
+    @logoTexture = UI::LoadTexture("MLE_and_TM_circle_logo_64.png");
+}
+
+
 void AddSimpleTooltip(const string &in msg) {
     if (UI::IsItemHovered()) {
         UI::SetNextWindowSize(400, 0, UI::Cond::Appearing);
