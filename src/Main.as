@@ -121,11 +121,12 @@ void RenderInterface() {
 }
 
 const string PluginName = Meta::ExecutingPlugin().Name;
-const string MenuLabel = "\\$f28" + Icons::ListAlt + Icons::Circle + "\\$z " + Meta::ExecutingPlugin().Name;
+const string MenuLabel = "\\$f28" + Icons::AngleUp + Icons::Circle + "\\$z " + Meta::ExecutingPlugin().Name;
 
 /** Render function called every frame intended only for menu items in `UI`.
 */
 void RenderMenu() {
+    auto cStart = UI::GetCursorPos();
     if (UI::BeginMenu(MenuLabel)) {
         if (UI::MenuItem("Enabled", "", S_Enabled)) {
             S_Enabled = !S_Enabled;
@@ -137,6 +138,12 @@ void RenderMenu() {
             OpenExplorerPath(IO::FromStorageFolder(""));
         }
         UI::EndMenu();
+    }
+    auto cEnd = UI::GetCursorPos();
+    if (logoTexture !is null) {
+        UI::SetCursorPos(cStart + vec2(1, 0));
+        UI::Image(logoTexture, vec2(UI::GetTextLineHeight()));
+        UI::SetCursorPos(cEnd);
     }
 }
 

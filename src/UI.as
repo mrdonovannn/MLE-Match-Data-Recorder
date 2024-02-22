@@ -1,7 +1,9 @@
 UI::Texture@ logoTexture;
+UI::Font@ g_BigFont;
 
 void LoadTextures() {
-    @logoTexture = UI::LoadTexture("MLE_and_TM_circle_logo_64.png");
+    @logoTexture = UI::LoadTexture("src/MLE_TM_logo_64.png");
+    @g_BigFont = UI::LoadFont("DroidSans.ttf", 26);
 }
 
 

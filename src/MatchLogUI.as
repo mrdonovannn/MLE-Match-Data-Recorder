@@ -24,8 +24,8 @@ void RenderMatchLogUI() {
     UI::End();
 }
 
-void RenderUIFooter(bool addLink = true) {
-    UI::Separator();
+void RenderUIFooter(bool drawSep = true) {
+    if (drawSep) UI::Separator();
 
     auto lineHeight = UI::GetTextLineHeightWithSpacing();
     auto imgSize = vec2(lineHeight * 2.0);
