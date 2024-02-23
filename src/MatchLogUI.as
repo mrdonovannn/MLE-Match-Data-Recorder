@@ -15,7 +15,7 @@ void RenderMatchLogUI() {
 
     int wwidth = 400;
     vec2 pos = vec2((Draw::GetWidth() - wwidth) >> 1, Draw::GetHeight() >> 1) / UI::GetScale();
-    UI::SetNextWindowPos(pos.x, pos.y);
+    UI::SetNextWindowPos(int(pos.x), int(pos.y));
     UI::SetNextWindowSize(wwidth, -1, UI::Cond::Always);
     if (UI::Begin(PluginName + ": Current Match", showMatchLogUI)) {
         RenderMatchPromptUI_Inner();

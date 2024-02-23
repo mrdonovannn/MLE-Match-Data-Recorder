@@ -63,7 +63,7 @@ for pluginSrc in ${pluginSources[@]}; do
 
   function buildPlugin {
     # 7z a ./$BUILD_NAME ./fonts ./$pluginSrc/* ./LICENSE ./README.md
-    7z a ./$BUILD_NAME ./$pluginSrc ./LICENSE ./README.md
+    7z -bb1 a ./$BUILD_NAME ./$pluginSrc ./info.toml ./LICENSE ./README.md
 
     cp -v $BUILD_NAME $RELEASE_NAME
 
