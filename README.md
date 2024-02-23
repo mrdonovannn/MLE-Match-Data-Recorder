@@ -2,13 +2,17 @@
 
 Records match data (teams, KO, etc) during play and saves a .json file with all rounds for that
 
+### Developing
+
+Easy way: Clone the repository to `OpenplanetNext/Plugins/mle-match-data-recorder`. You cannot have both the .op version and the folder version running at the same time.
+
 ### Build .op
 
 1. create a new directory for convenience
 2. copy in:
   - `info.toml`
-  - everything in `./src/`
-3. this folder should have info.toml and .as files in it's root.
+  - `src/` directory
+3. this folder should have 2 things: `info.toml` and the `src` directory in it's root.
 4. select all in folder.
 5. create a zip from these files
   - (**windows**) select all and right click > show more options > send to > compressed (zipped) folder
